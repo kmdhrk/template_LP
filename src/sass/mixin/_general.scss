@@ -1,0 +1,19 @@
+@import "../mixin/_mixin.scss";
+@import "../setting/_setting.scss";
+
+
+//PC版,SP版要素消去
+.pc {
+
+	@include mq("sp") {
+		display: none;
+	}
+}
+
+.sp {
+	display: none;
+
+	@include mq("sp") {
+		display: block;
+	}
+}

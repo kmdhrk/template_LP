@@ -1,0 +1,9 @@
+$inner:;
+
+//breakpoints
+$breakpoints: (
+	"ssp": "screen and (max-width: 374px)",//iphone5
+	"sp": "screen and (max-width: 480px)",//smartphone
+	"tab":"screen and (max-width: 768px)",//tablet
+	"pc": "screen and (max-width: '#{$inner}')",//PC
+);
