@@ -12,20 +12,23 @@
 @function get-vw($size, $viewport) {
 	$rate: 100 / $viewport;
 
-	@return $rate * $size * 1vw ;
+	@return $rate * $size * 1vw;
 }
+
 @function get-vw-sp($size, 375) {
 	$rate: 100 / $viewport;
 
-	@return $rate * $size * 1vw ;
+	@return $rate * $size * 1vw;
 }
+
 @function get-vw-tab($size, 768) {
 	$rate: 100 / $viewport;
 
-	@return $rate * $size * 1vw ;
+	@return $rate * $size * 1vw;
 }
+
 @function get-vw-pc($size, $inner) {
 	$rate: 100 / $viewport;
 
-	@return $rate * $size * 1vw ;
+	@return $rate * $size * 1vw;
 }
