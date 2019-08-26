@@ -15,20 +15,20 @@
 	@return $rate * $size * 1vw;
 }
 
-@function get-vw-sp($size, 375) {
-	$rate: 100 / $viewport;
+@function get-vw-sp($size) {
+	$rate: 100 / 375;
 
 	@return $rate * $size * 1vw;
 }
 
-@function get-vw-tab($size, 768) {
-	$rate: 100 / $viewport;
+@function get-vw-tab($size) {
+	$rate: 100 / 600;
 
 	@return $rate * $size * 1vw;
 }
 
 @function get-vw-pc($size, $inner) {
-	$rate: 100 / $viewport;
+	$rate: 100 / $inner;
 
 	@return $rate * $size * 1vw;
 }

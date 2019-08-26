@@ -3,17 +3,17 @@
 
 
 //PC版,SP版要素消去
-.pc {
+.is-pc {
 
-	@include mq("sp") {
+	@include mq("sp-tab") {
 		display: none;
 	}
 }
 
-.sp {
+.is-sp {
 	display: none;
 
-	@include mq("sp") {
+	@include mq("sp-tab") {
 		display: block;
 	}
 }

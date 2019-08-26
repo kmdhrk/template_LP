@@ -1,4 +1,4 @@
-/*-------------------------------------------------------------  
+/*-------------------------------------------------------------
 Author: hiro
 定義
 1.gulp定義
@@ -19,44 +19,45 @@ Author: hiro
 ---------------------------------------------------------------*/
 
 //1.gulp定義
-var gulp = require("gulp");
+var gulp = require( 'gulp' );
 
 //2.path定義
 var path = {
-  src: "./src",
-  dist: "./dist"
+  src: './src',
+  pub: './public',
+  dist: './dist'
 };
 
 //3.リロード定義
-var browserSync = require("browser-sync");
+var browserSync = require( 'browser-sync' );
 
 //4.ejs
-var ejs = require("gulp-ejs");
-var replace = require("gulp-replace");
+var ejs = require( 'gulp-ejs' );
+var replace = require( 'gulp-replace' );
 
 //5.SASS関連
-var sass = require("gulp-sass");
-var plumber = require("gulp-plumber");
-var notify = require("gulp-notify");
-var sassGlob = require("gulp-sass-glob");
-var mmq = require("gulp-merge-media-queries");
-var gulpStylelint = require("gulp-stylelint");
-var postcss = require("gulp-postcss");
-var autoprefixer = require("autoprefixer");
-var cssdeclsort = require("css-declaration-sorter");
+var sass = require( 'gulp-sass' );
+var plumber = require( 'gulp-plumber' );
+var notify = require( 'gulp-notify' );
+var sassGlob = require( 'gulp-sass-glob' );
+var mmq = require( 'gulp-merge-media-queries' );
+var gulpStylelint = require( 'gulp-stylelint' );
+var postcss = require( 'gulp-postcss' );
+var autoprefixer = require( 'autoprefixer' );
+var cssdeclsort = require( 'css-declaration-sorter' );
 
 //6.minファイル
-var cleanCSS = require("gulp-clean-css");
-var rename = require("gulp-rename");
-var uglify = require("gulp-uglify");
-var htmlmin = require("gulp-htmlmin");
+var cleanCSS = require( 'gulp-clean-css' );
+var rename = require( 'gulp-rename' );
+var uglify = require( 'gulp-uglify' );
+var htmlmin = require( 'gulp-htmlmin' );
 
 //7.画像圧縮
-var imagemin = require("gulp-imagemin");
-var imageminPngquant = require("imagemin-pngquant");
-var imageminMozjpeg = require("imagemin-mozjpeg");
+var imagemin = require( 'gulp-imagemin' );
+var imageminPngquant = require( 'imagemin-pngquant' );
+var imageminMozjpeg = require( 'imagemin-mozjpeg' );
 var imageminOption = [
-  imageminPngquant({ quality: [0.65, 0.85] }),
+  imageminPngquant({ quality: [ 0.65, 0.85 ] }),
   imageminMozjpeg({ quality: 85 }),
   imagemin.gifsicle({
     interlaced: false,
@@ -68,6 +69,9 @@ var imageminOption = [
   imagemin.svgo()
 ];
 
+//7.移行
+var transfer;
+
 /*---------------------------------------------------
 処理内容
 1.ローカルサーバー構築
@@ -78,94 +82,104 @@ var imageminOption = [
 6.デフォルト
 -----------------------------------------------------*/
 //1.ローカルサーバー構築
-gulp.task("browser-sync", function(done) {
+gulp.task( 'browser-sync', function( done ) {
   browserSync.init({
     server: {
-      baseDir: path.src,
-      index: "index.html"
+      baseDir: path.pub,
+      index: 'index.html'
     }
   });
   done();
 });
 
-gulp.task("bs-reload", function(done) {
+gulp.task( 'bs-reload', function( done ) {
   browserSync.reload();
   done();
 });
 
 //2.ファイル更新監視
-gulp.task("watch", function(done) {
-  gulp.watch(path.src + "/**/*.scss", gulp.task("sass"));
+gulp.task( 'watch', function( done ) {
+  gulp.watch( path.src + '/**/*.scss', gulp.task( 'sass' ) );
   gulp.watch(
-    [path.src + "/**/*", "!" + path.src + "/**/*.scss"],
-    gulp.task("bs-reload")
+    [ path.src + '/**/*', '!' + path.src + '/**/*.scss' ],
+    gulp.task( 'bs-reload' )
   );
   done();
 });
 
 //3.ejsコンパイル
-gulp.task("ejs", done => {
+gulp.task( 'ejs', function( done ) {
   gulp
-    .src([path.src + "/ejs/**/*.ejs", "!" + path.src + "/ejs/**/_*.ejs"])
-    .pipe(ejs({}, {}, { ext: ".html" }))
-    .pipe(rename({ extname: ".html" }))
-    .pipe(replace(/[\s\S]*?(<!DOCTYPE)/, "$1"))
-    .pipe(gulp.dest(path.src));
+    .src([ path.src + '/ejs/**/*.ejs', '!' + path.src + '/ejs/**/_*.ejs' ])
+    .pipe( ejs({}, {}, { ext: '.html' }) )
+    .pipe( rename({ extname: '.html' }) )
+    .pipe( replace( /[\s\S]*?(<!DOCTYPE)/, '$1' ) )
+    .pipe( gulp.dest( path.pub ) );
   done();
 });
 
 //4.Sassコンパイル
-gulp.task("sass", function(done) {
+gulp.task( 'sass', function( done ) {
   gulp
-    .src(path.src + "/sass/**/*.scss")
+    .src( path.src + '/sass/**/*.scss' )
     .pipe(
-      plumber({ errorHandler: notify.onError("Error: <%= error.message %>") })
+      plumber({ errorHandler: notify.onError( 'Error: <%= error.message %>' ) })
     )
-    .pipe(sassGlob())
-    .pipe(sass({ outputStyle: "expanded" }))
-    .pipe(postcss([autoprefixer()]))
-    .pipe(postcss([cssdeclsort({ order: "alphabetically" })]))
-    .pipe(mmq())
+    .pipe( sassGlob() )
+    .pipe( sass({ outputStyle: 'expanded' }) )
+    .pipe( postcss([ autoprefixer() ]) )
+    .pipe( postcss([ cssdeclsort({ order: 'alphabetically' }) ]) )
+    .pipe( mmq() )
     .pipe(
       gulpStylelint({
         fix: true
       })
     )
-    .pipe(gulp.dest(path.src + "/css"));
+    .pipe( gulp.dest( path.pub + '/assets/css' ) );
   done();
 });
 
-//5.minファイル作成
-gulp.task("htmlmin", function() {
+//5.publicファイルに移行
+gulp.task( 'transfer', function() {
   return gulp
-    .src(path.src + "/*.html")
-    .pipe(htmlmin({ collapseWhitespace: true }))
-    .pipe(htmlmin({ removeComments: true }))
-    .pipe(gulp.dest(path.dist));
+    .src( path.src + '/assets/**/*' )
+    .pipe( gulp.dest( path.pub + '/assets/**/*' ) );
 });
 
-gulp.task("jsmin", function() {
+//6.minファイル作成
+gulp.task( 'htmlmin', function() {
   return gulp
-    .src(path.src + "/js/*.js")
-    .pipe(uglify())
-    .pipe(gulp.dest(path.dist + "/js/"));
+    .src( path.src + '/*.html' )
+    .pipe( htmlmin({ collapseWhitespace: true }) )
+    .pipe( htmlmin({ removeComments: true }) )
+    .pipe( gulp.dest( path.dist ) );
 });
 
-gulp.task("cssmin", function() {
+gulp.task( 'jsmin', function() {
   return gulp
-    .src(path.src + "/css/**/*.css")
-    .pipe(cleanCSS())
-    .pipe(gulp.dest(path.dist + "/css/"));
+    .src( path.src + '/assets/js/*.js' )
+    .pipe( uglify() )
+    .pipe( gulp.dest( path.dist + '/assets/js/' ) );
 });
 
-gulp.task("imagemin", function() {
+gulp.task( 'cssmin', function() {
   return gulp
-    .src(path.src + "/img/**/*.{png,jpg,gif,svg}")
-    .pipe(imagemin(imageminOption))
-    .pipe(gulp.dest(path.dist + "/img/"));
+    .src( path.src + '/assets/css/**/*.css' )
+    .pipe( cleanCSS() )
+    .pipe( gulp.dest( path.dist + '/assets/css/' ) );
 });
 
-gulp.task("allmin", gulp.parallel("htmlmin", "cssmin", "jsmin", "imagemin"));
+gulp.task( 'imagemin', function() {
+  return gulp
+    .src( path.src + '/assets/img/**/*.{png,jpg,gif,svg}' )
+    .pipe( imagemin( imageminOption ) )
+    .pipe( gulp.dest( path.dist + '/assets/img/' ) );
+});
 
-//6.デフォルト
-gulp.task("default", gulp.series(gulp.parallel("browser-sync", "watch")));
+gulp.task( 'allmin', gulp.parallel( 'htmlmin', 'cssmin', 'jsmin', 'imagemin' ) );
+
+//7.デフォルト
+gulp.task(
+  'default',
+  gulp.series( gulp.parallel( 'browser-sync', 'watch', 'transfer' ) )
+);
