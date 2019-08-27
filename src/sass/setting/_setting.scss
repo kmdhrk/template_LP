@@ -3,8 +3,8 @@ $inner:100px; //設定する
 //breakpoints
 $breakpoints: (
 	"ssp": "screen and (max-width: 374px)",//iphone5
-	"sp": "screen and (max-width: 600px)",//smartphone
-	"sp-tab":"screen and (max-width: 768px)",//tablet
+	"sp": "screen and (max-width: 599px)",//smartphone
+	"sp-tab":"screen and (max-width: 767px)",//tablet
 	"tab": "screen and (max-width: '#{$inner}')",//PC
 );
 

@@ -69,11 +69,6 @@ var imageminOption = [
   imagemin.svgo()
 ];
 
-//7.移行
-var transfer;
-var transferJs;
-var transferImg;
-
 /*---------------------------------------------------
 処理内容
 1.ローカルサーバー構築
@@ -103,7 +98,11 @@ gulp.task( 'bs-reload', function( done ) {
 gulp.task( 'watch', function( done ) {
   gulp.watch( path.src + '/**/*.ejs', gulp.task( 'ejs' ) );
   gulp.watch( path.src + '/**/*.scss', gulp.task( 'sass' ) );
-  gulp.watch( path.src + '/assets/**/*', gulp.task( 'transfer' ) );
+  gulp.watch( path.src + '/assets/js/*.js', gulp.task( 'transferJs' ) );
+  gulp.watch(
+    path.src + '/assets/img/*.{png,jpg,gif,svg}',
+    gulp.task( 'transferImg' )
+  );
   gulp.watch( path.src + '/**/*', gulp.task( 'bs-reload' ) );
   done();
 });
@@ -112,6 +111,9 @@ gulp.task( 'watch', function( done ) {
 gulp.task( 'ejs', function( done ) {
   gulp
     .src([ path.src + '/ejs/**/*.ejs', '!' + path.src + '/ejs/**/_*.ejs' ])
+    .pipe(
+      plumber({ errorHandler: notify.onError( 'Error: <%= error.message %>' ) })
+    )
     .pipe( ejs({}, {}, { ext: '.html' }) )
     .pipe( rename({ extname: '.html' }) )
     .pipe( replace( /[\s\S]*?(<!DOCTYPE)/, '$1' ) )
@@ -151,7 +153,6 @@ gulp.task( 'transferImg', function() {
     .src( path.src + '/assets/img/*.{png,jpg,gif,svg}' )
     .pipe( gulp.dest( path.pub + '/assets/img/' ) );
 });
-gulp.task( 'transfer', gulp.parallel( 'transferJs', 'transferImg' ) ) ;
 
 //6.minファイル作成
 gulp.task( 'htmlmin', function() {

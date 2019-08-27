@@ -4,7 +4,7 @@
 
 //PC版,SP版要素消去
 .is-pc {
-
+	display: block;
 	@include mq("sp-tab") {
 		display: none;
 	}
