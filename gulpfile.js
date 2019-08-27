@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------
-Author: hiro
+Author: Hiro
 定義
 1.gulp定義
 2.path定義
@@ -71,6 +71,8 @@ var imageminOption = [
 
 //7.移行
 var transfer;
+var transferJs;
+var transferImg;
 
 /*---------------------------------------------------
 処理内容
@@ -99,11 +101,10 @@ gulp.task( 'bs-reload', function( done ) {
 
 //2.ファイル更新監視
 gulp.task( 'watch', function( done ) {
+  gulp.watch( path.src + '/**/*.ejs', gulp.task( 'ejs' ) );
   gulp.watch( path.src + '/**/*.scss', gulp.task( 'sass' ) );
-  gulp.watch(
-    [ path.src + '/**/*', '!' + path.src + '/**/*.scss' ],
-    gulp.task( 'bs-reload' )
-  );
+  gulp.watch( path.src + '/assets/**/*', gulp.task( 'transfer' ) );
+  gulp.watch( path.src + '/**/*', gulp.task( 'bs-reload' ) );
   done();
 });
 
@@ -140,11 +141,17 @@ gulp.task( 'sass', function( done ) {
 });
 
 //5.publicファイルに移行
-gulp.task( 'transfer', function() {
+gulp.task( 'transferJs', function() {
   return gulp
-    .src( path.src + '/assets/**/*' )
-    .pipe( gulp.dest( path.pub + '/assets/**/*' ) );
+    .src( path.src + '/assets/js/*.js' )
+    .pipe( gulp.dest( path.pub + '/assets/js/' ) );
 });
+gulp.task( 'transferImg', function() {
+  return gulp
+    .src( path.src + '/assets/img/*.{png,jpg,gif,svg}' )
+    .pipe( gulp.dest( path.pub + '/assets/img/' ) );
+});
+gulp.task( 'transfer', gulp.parallel( 'transferJs', 'transferImg' ) ) ;
 
 //6.minファイル作成
 gulp.task( 'htmlmin', function() {
@@ -179,7 +186,4 @@ gulp.task( 'imagemin', function() {
 gulp.task( 'allmin', gulp.parallel( 'htmlmin', 'cssmin', 'jsmin', 'imagemin' ) );
 
 //7.デフォルト
-gulp.task(
-  'default',
-  gulp.series( gulp.parallel( 'browser-sync', 'watch', 'transfer' ) )
-);
+gulp.task( 'default', gulp.series( gulp.parallel( 'browser-sync', 'watch' ) ) );
